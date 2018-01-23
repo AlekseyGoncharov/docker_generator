@@ -23,6 +23,17 @@ func main() {
 		distrib: "alpine",
 		package_name: "php:7.2-fpm-alpine",
 	}
+	php_version["7.1-jessie"] = version{
+		php_version: "7.1",
+		distrib: "debian",
+		package_name: "php:7.1-fpm-jessie"
+	}
+	php_version["7.2-jessie"] = version{
+		php_version: "7.2",
+		distrib: "debian",
+		package_name: "php:7.2-fpm-jessie"
+	}
+
 	maintainer := "\"DockerFile generator by fp <alexwolk01@gmail.com>\""
 	composer := true
 	var php_modules []string
