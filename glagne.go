@@ -54,6 +54,12 @@ func main() {
 			//add pecl string
 		}
 	}
+
+	var ENV []string
+	ENV = append(ENV,"php_conf /usr/local/etc/php-fpm.conf\n")
+	ENV = append(ENV, "fpm_conf /usr/local/etc/php-fpm.d/www.conf\n")
+	ENV = append(ENV, "php_vars /usr/local/etc/php/conf.d/docker-vars.ini\n")
+	ENV = append(ENV, "LD PELOAD /us/lib/peloadable_libconv,so php\n")
 	HEAD := "FROM " + php_version["7.1-alpine"].package_name + "\n" + "LABEL maintainer = " + maintainer + "\n"
 	if composer {
 		fmt.Println(HEAD, "10")
