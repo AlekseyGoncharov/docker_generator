@@ -1,7 +1,9 @@
 // for alpine version
 package alpine
 
-import
+import (
+	"strings"
+)
 
 func soft()string {
 	software := "apk update && \\\n"
