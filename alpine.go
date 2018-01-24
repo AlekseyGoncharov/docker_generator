@@ -33,7 +33,7 @@ func soft()string {
 	software += "sqlite-dev \\\n"
 	software += "bzip2-dev \\\n"
 	software += "libmemcached-dev \\\n"
-	software += "libjpeg-tubo-dev "
+	software += "libjpeg-tubo-dev \\\n"
 	software += "&& \\\n"
 	return software
 }
