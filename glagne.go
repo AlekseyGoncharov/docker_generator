@@ -14,8 +14,8 @@ type version struct {
 
 func php_composer()string {
 	compose := "EXPECTED_COMPOSER_SIGNATURE=$(wget -q -O - https://composer.github.io/installer.sig) && \\\n"
-	compose += "php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\" && \\\n"
-	compose += "php -r \"if (hash_file('SHA384', 'composer-setup.php') === '${EXPECTED_COMPOSER_SIGNATURE}') "
+	compose += "	php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\" && \\\n"
+	compose += "	php -r \"if (hash_file('SHA384', 'composer-setup.php') === '${EXPECTED_COMPOSER_SIGNATURE}') "
 	compose += "{ echo 'Composer.phar Installer verified'; } else { echo 'Composer.phar Installer corrupt'; "
 	compose += "unlink('composer-setup.php'); } echo PHP_EOL;\" && \\\n"
 	compose += "php composer-setup.php --install-dir=/usr/bin --filename=composer && \\\n"
