@@ -11,6 +11,18 @@ type version struct {
 	distrib string
 	package_name string
 	}
+
+func php_composer()string {
+	compose := "EXPECTED_COMPOSER_SIGNATURE=$(wget -q -O - https://composer.github.io/installer.sig) && \\\n"
+	compose += "php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\" && \\\n"
+	compose += "php -r \"if (hash_file('SHA384', 'composer-setup.php') === '${EXPECTED_COMPOSER_SIGNATURE}') "
+	compose += "{ echo 'Composer.phar Installer verified'; } else { echo 'Composer.phar Installer corrupt'; "
+	compose += "unlink('composer-setup.php'); } echo PHP_EOL;\" && \\\n"
+	compose += "php composer-setup.php --install-dir=/usr/bin --filename=composer && \\\n"
+	compose += "php -r \"unlink('composer-setup.php');\" && \\\n"
+	return compose
+}
+
 func main() {
 	php_version := make(map[string]version)
 	php_version["7.1-alpine"] = version{

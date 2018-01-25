@@ -2,7 +2,7 @@
 package alpine
 
 import (
-	"strings"
+	//"strings"
 )
 
 func soft()string {
