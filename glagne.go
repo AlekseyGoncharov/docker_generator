@@ -1,18 +1,13 @@
 // This is simple Dockerfile generator
 package main
-import (
-	//"os"
-	//"gopkg.in/yaml.v2"
-	//"fmt"
 
-)
 type version struct {
-	php_version string
-	distrib string
+	php_version  string
+	distrib      string
 	package_name string
-	}
+}
 
-func php_composer_setup()string {
+func php_composer_setup() string {
 	compose := "EXPECTED_COMPOSER_SIGNATURE=$(wget -q -O - https://composer.github.io/installer.sig) && \\\n"
 	compose += "	php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\" && \\\n"
 	compose += "	php -r \"if (hash_file('SHA384', 'composer-setup.php') === '${EXPECTED_COMPOSER_SIGNATURE}') "
@@ -23,7 +18,7 @@ func php_composer_setup()string {
 	return compose
 }
 
-func install_memcached()string {
+func install_memcached() string {
 	memcach := "apk add --virtual .memcached-build-dependencies \\\n"
 	memcach += "	libmemcached-dev \\\n"
 	memcach += "	cyrus-sasl-dev && \\\n"
@@ -42,32 +37,34 @@ func install_memcached()string {
 	return memcach
 }
 
-func unstandart_modules_install(module string)(string, string) {
+func unstandart_modules_install(module string) (string, string) {
 	if module == "memcached" {
 		arg := "ARG MEMCACHED_TAG=v3.0.4"
 		return arg, install_memcached()
 	}
+	return "", ""
 }
+
 func main() {
 	php_version := make(map[string]version)
 	php_version["7.1-alpine"] = version{
-		php_version: "7.1",
-		distrib: "alpine",
+		php_version:  "7.1",
+		distrib:      "alpine",
 		package_name: "php:7.1-fpm-alpine",
 	}
 	php_version["7.2-alpine"] = version{
-		php_version: "7.1",
-		distrib: "alpine",
+		php_version:  "7.1",
+		distrib:      "alpine",
 		package_name: "php:7.2-fpm-alpine",
 	}
 	php_version["7.1-jessie"] = version{
-		php_version: "7.1",
-		distrib: "debian",
+		php_version:  "7.1",
+		distrib:      "debian",
 		package_name: "php:7.1-fpm-jessie",
 	}
 	php_version["7.2-jessie"] = version{
-		php_version: "7.2",
-		distrib: "debian",
+		php_version:  "7.2",
+		distrib:      "debian",
 		package_name: "php:7.2-fpm-jessie",
 	}
 
@@ -75,18 +72,18 @@ func main() {
 	composer := true
 	var php_modules []string
 	php_modules = append(php_modules, "mysqli")
-	php_modules = append(php_modules,"memcached")
+	php_modules = append(php_modules, "memcached")
 	modules_nopecl := []string{"memcached", "imagick"}
 
 	var switcher bool
 	ARG := "\n"
 	modules_lines := ""
 	var arg, str_module string
-	for _, module := range(php_modules) {
+	for _, module := range (php_modules) {
 		switcher = true
-		for _,nopecl := range(modules_nopecl) {
+		for _, nopecl := range (modules_nopecl) {
 			if module == nopecl {
-				arg, str_module = unstandart_modules_install()
+				arg, str_module = unstandart_modules_install(module)
 				//generate script
 				switcher = false
 				modules_lines += str_module
@@ -100,7 +97,7 @@ func main() {
 	}
 
 	var ENV []string
-	ENV = append(ENV,"php_conf /usr/local/etc/php-fpm.conf\n")
+	ENV = append(ENV, "php_conf /usr/local/etc/php-fpm.conf\n")
 	ENV = append(ENV, "fpm_conf /usr/local/etc/php-fpm.d/www.conf\n")
 	ENV = append(ENV, "php_vars /usr/local/etc/php/conf.d/docker-vars.ini\n")
 	ENV = append(ENV, "LD PRELOAD /usr/lib/preloadable_libconv.so php\n")
@@ -109,6 +106,5 @@ func main() {
 	if composer {
 		Dockerfile += php_composer_setup()
 	}
-
 
 }
