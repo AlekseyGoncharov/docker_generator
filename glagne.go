@@ -2,7 +2,7 @@
 package main
 
 type version struct {
-	php_version  string
+	php          string
 	distrib      string
 	package_name string
 }
@@ -48,22 +48,22 @@ func unstandart_modules_install(module string) (string, string) {
 func main() {
 	php_version := make(map[string]version)
 	php_version["7.1-alpine"] = version{
-		php_version:  "7.1",
+		php:          "7.1",
 		distrib:      "alpine",
 		package_name: "php:7.1-fpm-alpine",
 	}
 	php_version["7.2-alpine"] = version{
-		php_version:  "7.1",
+		php:          "7.1",
 		distrib:      "alpine",
 		package_name: "php:7.2-fpm-alpine",
 	}
 	php_version["7.1-jessie"] = version{
-		php_version:  "7.1",
+		php:          "7.1",
 		distrib:      "debian",
 		package_name: "php:7.1-fpm-jessie",
 	}
 	php_version["7.2-jessie"] = version{
-		php_version:  "7.2",
+		php:          "7.2",
 		distrib:      "debian",
 		package_name: "php:7.2-fpm-jessie",
 	}
