@@ -5,7 +5,7 @@ import (
 	//"strings"
 )
 
-func soft()string {
+func soft_install_apk()string {
 	software := "apk update && \\\n"
 	software += "apk add --no-cache bash \\\n"
 	software += "wget \\\n"
