@@ -6,7 +6,7 @@ type version struct {
 	distrib      string
 	package_name string
 }
-
+// php composer installation
 func php_composer_setup() string {
 	compose := "EXPECTED_COMPOSER_SIGNATURE=$(wget -q -O - https://composer.github.io/installer.sig) && \\\n"
 	compose += "	php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\" && \\\n"
@@ -17,7 +17,7 @@ func php_composer_setup() string {
 	compose += "php -r \"unlink('composer-setup.php');\" && \\\n"
 	return compose
 }
-
+//install memcached
 func install_memcached() string {
 	memcach := "apk add --virtual .memcached-build-dependencies \\\n"
 	memcach += "	libmemcached-dev \\\n"
@@ -36,9 +36,10 @@ func install_memcached() string {
 	memcach += "apk del .memcached-build-dependencies && \\\n"
 	return memcach
 }
-
+// Setup modules from code(GIT)
 func unstandart_modules_install(module string) (string, string) {
 	if module == "memcached" {
+		// version memcached
 		arg := "ARG MEMCACHED_TAG=v3.0.4"
 		return arg, install_memcached()
 	}
