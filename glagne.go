@@ -4,10 +4,19 @@ package main
 import (
 	"fmt"
 	"awesomeProject/alpine"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
+	"log"
+	"strings"
 )
 
+type ParsingYaml struct {
+	From     string `yaml:"FROM"`
+	Composer string `yaml:"composer,omitempty"`
+	PhpExt   string `yaml:"php_modules"`
+}
 
-type version struct {
+type Version struct {
 	php          string
 	distrib      string
 	package_name string
@@ -95,35 +104,47 @@ func unstandart_modules_install(module string) (string, string) {
 }
 
 func main() {
-	php_version := make(map[string]version)
-	php_version["7.1-alpine"] = version{
+	conf, err := ioutil.ReadFile("config.yml")
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
+	confYaml := ParsingYaml{}
+
+	err = yaml.Unmarshal([]byte(conf), &confYaml)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
+
+	php_version := make(map[string]Version)
+	php_version["7.1-alpine"] = Version{
 		php:          "7.1",
 		distrib:      "alpine",
 		package_name: "php:7.1-fpm-alpine",
 	}
-	php_version["7.2-alpine"] = version{
+	php_version["7.2-alpine"] = Version{
 		php:          "7.1",
 		distrib:      "alpine",
 		package_name: "php:7.2-fpm-alpine",
 	}
-	php_version["7.1-jessie"] = version{
+	php_version["7.1-jessie"] = Version{
 		php:          "7.1",
 		distrib:      "debian",
 		package_name: "php:7.1-fpm-jessie",
 	}
-	php_version["7.2-jessie"] = version{
+	php_version["7.2-jessie"] = Version{
 		php:          "7.2",
 		distrib:      "debian",
 		package_name: "php:7.2-fpm-jessie",
 	}
 
 	maintainer := "\"DockerFile generator by fp <alexwolk01@gmail.com>\" \n"
-	composer := true
+	//composer := true
 	var php_modules []string
-	php_modules = append(php_modules, "mysqli")
-	php_modules = append(php_modules, "memcached")
-	php_modules = append(php_modules, "imagick")
-	php_modules = append(php_modules, "gd")
+	php_modules = strings.Split(confYaml.PhpExt, " ")
+	//php_modules = append(php_modules, "mysqli")
+	//php_modules = append(php_modules, "memcached")
+	//php_modules = append(php_modules, "imagick")
+	//php_modules = append(php_modules, "gd")
 	modules_nopecl := []string{"memcached", "imagick", "msgpack"}
 
 	var switcher bool
@@ -163,16 +184,16 @@ func main() {
 	ENV += "ENV fpm_conf /usr/local/etc/php-fpm.d/www.conf\n"
 	ENV += "ENV php_vars /usr/local/etc/php/conf.d/docker-vars.ini\n"
 	ENV += "ENV LD PRELOAD /usr/lib/preloadable_libconv.so php\n"
-	HEAD := "FROM " + php_version["7.1-alpine"].package_name + "\n" + "LABEL maintainer = " + maintainer + "\n"
+	HEAD := "FROM " + php_version[confYaml.From].package_name + "\n" + "LABEL maintainer = " + maintainer + "\n"
 
 	Dockerfile := HEAD
 	Dockerfile += ENV
 	Dockerfile += ARG
-	if php_version["7.1-alpine"].distrib == "alpine" {
+	if php_version[confYaml.From].distrib == "alpine" {
 		Dockerfile += alpine.Soft_install_apk()
 	}
 	Dockerfile += docker_php_ext_install
-	if composer {
+	if confYaml.Composer == "YES" {
 		Dockerfile += php_composer_setup()
 	}
 	Dockerfile += modules_lines

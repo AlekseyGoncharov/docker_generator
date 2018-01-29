@@ -1,0 +1,3 @@
+FROM: 7.1-alpine
+composer: YES
+php_modules: gd msgpack imagick calendar
