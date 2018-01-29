@@ -1,3 +1,3 @@
 FROM: 7.1-alpine
 composer: YES
-php_modules: gd msgpack imagick calendar
+php_modules: iconv pdo_mysql pdo_sqlite mysqli gd exif intl xsl json soap dom zip opcache xml mbstring bz2 calendar ctype bcmath msgpack imagick memcached

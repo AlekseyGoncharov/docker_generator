@@ -3,7 +3,6 @@ package main
 
 import (
 	"fmt"
-	"awesomeProject/alpine"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
@@ -20,6 +19,41 @@ type Version struct {
 	php          string
 	distrib      string
 	package_name string
+}
+
+func Soft_install_apk() string {
+	software := "apk update && \\\n"
+	software += "apk add --no-cache bash \\\n"
+	software += "wget \\\n"
+	software += "supervisor \\\n"
+	software += "curl \\\n"
+	software += "libcurl \\\n"
+	software += "git \\\n"
+	software += "python \\\n"
+	software += "python-dev \\\n"
+	software += "py-pip \\\n"
+	software += "augeas-dev \\\n"
+	software += "openssl-dev \\\n"
+	software += "ca-certificates \\\n"
+	software += "dialog \\\n"
+	software += "autoconf \\\n"
+	software += "make \\\n"
+	software += "gcc \\\n"
+	software += "musl-dev \\\n"
+	software += "linux-headers \\\n"
+	software += "libmcrypt-dev \\\n"
+	software += "libpng-dev \\\n"
+	software += "icu-dev \\\n"
+	software += "libpq \\\n"
+	software += "libxslt-dev \\\n"
+	software += "libffi-dev \\\n"
+	software += "freetype-dev \\\n"
+	software += "sqlite-dev \\\n"
+	software += "bzip2-dev \\\n"
+	software += "libmemcached-dev \\\n"
+	software += "libjpeg-tubo-dev \\\n"
+	software += "&& \\\n"
+	return software
 }
 // php composer installation
 func php_composer_setup() string {
@@ -190,7 +224,7 @@ func main() {
 	Dockerfile += ENV
 	Dockerfile += ARG
 	if php_version[confYaml.From].distrib == "alpine" {
-		Dockerfile += alpine.Soft_install_apk()
+		Dockerfile += Soft_install_apk()
 	}
 	Dockerfile += docker_php_ext_install
 	if confYaml.Composer == "YES" {
