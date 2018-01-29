@@ -1,11 +1,7 @@
 // for alpine version
 package alpine
 
-import (
-	//"strings"
-)
-
-func soft_install_apk()string {
+func Soft_install_apk() string {
 	software := "apk update && \\\n"
 	software += "apk add --no-cache bash \\\n"
 	software += "wget \\\n"
@@ -26,7 +22,7 @@ func soft_install_apk()string {
 	software += "musl-dev \\\n"
 	software += "linux-headers \\\n"
 	software += "libmcrypt-dev \\\n"
-	software += "libpng-dev \\\"
+	software += "libpng-dev \\\n"
 	software += "icu-dev \\\n"
 	software += "libpq \\\n"
 	software += "libxslt-dev \\\n"
