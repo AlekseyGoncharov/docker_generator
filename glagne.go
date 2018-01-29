@@ -122,10 +122,12 @@ func main() {
 	var php_modules []string
 	php_modules = append(php_modules, "mysqli")
 	php_modules = append(php_modules, "memcached")
+	php_modules = append(php_modules, "imagick")
+	php_modules = append(php_modules, "gd")
 	modules_nopecl := []string{"memcached", "imagick", "msgpack"}
 
 	var switcher bool
-	ARG := ""
+	ARG := "\n"
 	modules_lines := ""
 	var arg, str_module string
 	docker_modules := []string{"iconv", "pdo", "sqlite", "mysqli", "gd", "exif", "intl", "xsl",
@@ -142,6 +144,7 @@ func main() {
 				//generate script
 				switcher = false
 				modules_lines += str_module
+				ARG += arg + "\n"
 			}
 		}
 		if switcher {
@@ -151,10 +154,9 @@ func main() {
 				}
 			}
 		}
-		ARG += arg + "\n"
 
 	}
-	docker_php_ext_install += "&& \\\n docker-php-source delete && \\\n"
+	docker_php_ext_install += "&& \\\ndocker-php-source delete && \\\n"
 	ARG += "\n"
 
 	ENV := "ENV php_conf /usr/local/etc/php-fpm.conf\n"
