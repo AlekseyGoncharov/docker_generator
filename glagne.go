@@ -21,7 +21,7 @@ type Version struct {
 	package_name string
 }
 
-
+//install all-software
 func Soft_install_apk() string {
 	software := "RUN apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing gnu-libiconv && \\\n"
 	software += "echo @testing http://nl.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories && \\\n"
@@ -181,10 +181,6 @@ func main() {
 	//composer := true
 	var php_modules []string
 	php_modules = strings.Split(confYaml.PhpExt, " ")
-	//php_modules = append(php_modules, "mysqli")
-	//php_modules = append(php_modules, "memcached")
-	//php_modules = append(php_modules, "imagick")
-	//php_modules = append(php_modules, "gd")
 	modules_nopecl := []string{"memcached", "imagick", "msgpack"}
 
 	var switcher bool
