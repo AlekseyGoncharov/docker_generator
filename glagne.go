@@ -16,13 +16,13 @@ type ParsingYaml struct {
 }
 
 type Version struct {
-	php          string
-	distrib      string
-	package_name string
+	php         string
+	distrib     string
+	packageName string
 }
 
 //install all-software
-func Soft_install_apk() string {
+func SoftInstallApk() string {
 	software := "RUN apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing gnu-libiconv && \\\n"
 	software += "echo @testing http://nl.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories && \\\n"
 	software += "echo @main http://mirror.yandex.ru/mirrors/alpine/edge/main >>  /etc/apk/repositories && \\\n"
@@ -62,7 +62,7 @@ func Soft_install_apk() string {
 	return software
 }
 // php composer installation
-func Php_composer_setup() string {
+func PhpComposerSetup() string {
 	compose := "EXPECTED_COMPOSER_SIGNATURE=$(wget -q -O - https://composer.github.io/installer.sig) && \\\n"
 	compose += "	php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\" && \\\n"
 	compose += "	php -r \"if (hash_file('SHA384', 'composer-setup.php') === '${EXPECTED_COMPOSER_SIGNATURE}') "
@@ -73,14 +73,14 @@ func Php_composer_setup() string {
 	return compose
 }
 //install memcached
-func Std_conf_and_make() string {
-	make_and_conf := "phpize &&\\\n"
-	make_and_conf += "./configure && \\\n"
-	make_and_conf += "make && \\\n"
-	make_and_conf += "make install &&\\\n"
-	return make_and_conf
+func StdConfAndMake() string {
+	MakeAndConf := "phpize &&\\\n"
+	MakeAndConf += "./configure && \\\n"
+	MakeAndConf += "make && \\\n"
+	MakeAndConf += "make install &&\\\n"
+	return MakeAndConf
 }
-func Install_memcached() string {
+func InstallMemcached() string {
 	memcach := "apk add --virtual .memcached-build-dependencies \\\n"
 	memcach += "	libmemcached-dev \\\n"
 	memcach += "	cyrus-sasl-dev && \\\n"
@@ -99,14 +99,14 @@ func Install_memcached() string {
 	return memcach
 }
 
-func Install_msgpack() string {
+func InstallMsgpack() string {
 	msgpack := "git clone -o ${MSGPACK_TAG} --depth 1 https://github.com/msgpack/msgpack-php.git /tmp/msgpack-php && \\\n"
 	msgpack += "cd /tmp/msgpack-php && \\\n"
-	msgpack += Std_conf_and_make()
+	msgpack += StdConfAndMake()
 	return msgpack
 }
 
-func Install_imagick() string {
+func InstallImagick() string {
 	imagick := "apk add --no-cache --virtual .imagick-build-dependencies \\\n"
 	imagick += "  autoconf \\\n"
 	imagick += "  g++ \\\n"
@@ -120,25 +120,25 @@ func Install_imagick() string {
 	imagick += "  imagemagick &&\\\n"
 	imagick += "git clone -o ${IMAGICK_TAG} --depth 1 https://github.com/mkoppanen/imagick.git /tmp/imagick &&\\\n"
 	imagick += "cd /tmp/imagick && \\\n"
-	imagick += Std_conf_and_make()
+	imagick += StdConfAndMake()
 	imagick += "echo \"extension=imagick.so\" > /usr/local/etc/php/conf.d/ext-imagick.ini && \\\n"
 	imagick += "apk del .imagick-build-dependencies && \\\n"
 	return imagick
 }
 // Setup modules from code(GIT)
-func Unstandart_modules_install(module string) (string, string) {
+func UnstandartModulesInstall(module string) (string, string) {
 	if module == "memcached" {
 		// version memcached
 		arg := "ARG MEMCACHED_TAG=v3.0.4"
-		return arg, Install_memcached()
+		return arg, InstallMemcached()
 	}
 	if module == "msgpack" {
 		arg := "ARG MSGPACK_TAG=msgpack-2.0.2"
-		return arg, Install_msgpack()
+		return arg, InstallMsgpack()
 	}
 	if module == "imagick" {
 		arg := "ARG IMAGICK_TAG = \"3.4.2\""
-		return arg, Install_imagick()
+		return arg, InstallImagick()
 	}
 	return "", ""
 }
@@ -155,59 +155,59 @@ func main() {
 		log.Fatalf("error: %v", err)
 	}
 
-	php_version := make(map[string]Version)
-	php_version["7.1-alpine"] = Version{
-		php:          "7.1",
-		distrib:      "alpine",
-		package_name: "php:7.1-fpm-alpine",
+	PhpVersion := make(map[string]Version)
+	PhpVersion["7.1-alpine"] = Version{
+		php:         "7.1",
+		distrib:     "alpine",
+		packageName: "php:7.1-fpm-alpine",
 	}
-	php_version["7.2-alpine"] = Version{
-		php:          "7.1",
-		distrib:      "alpine",
-		package_name: "php:7.2-fpm-alpine",
+	PhpVersion["7.2-alpine"] = Version{
+		php:         "7.1",
+		distrib:     "alpine",
+		packageName: "php:7.2-fpm-alpine",
 	}
-	php_version["7.1-jessie"] = Version{
-		php:          "7.1",
-		distrib:      "debian",
-		package_name: "php:7.1-fpm-jessie",
+	PhpVersion["7.1-jessie"] = Version{
+		php:         "7.1",
+		distrib:     "debian",
+		packageName: "php:7.1-fpm-jessie",
 	}
-	php_version["7.2-jessie"] = Version{
-		php:          "7.2",
-		distrib:      "debian",
-		package_name: "php:7.2-fpm-jessie",
+	PhpVersion["7.2-jessie"] = Version{
+		php:         "7.2",
+		distrib:     "debian",
+		packageName: "php:7.2-fpm-jessie",
 	}
 
 	maintainer := "\"DockerFile generator by fp <alexwolk01@gmail.com>\" \n"
 	//composer := true
-	var php_modules []string
-	php_modules = strings.Split(confYaml.PhpExt, " ")
-	modules_nopecl := []string{"memcached", "imagick", "msgpack"}
+	var phpModules []string
+	phpModules = strings.Split(confYaml.PhpExt, " ")
+	ModulesNopecl := []string{"memcached", "imagick", "msgpack"}
 
 	var switcher bool
 	ARG := "\n"
-	modules_lines := ""
-	var arg, str_module string
-	docker_modules := []string{"iconv", "pdo", "sqlite", "mysqli", "gd", "exif", "intl", "xsl",
+	ModulesLines := ""
+	var arg, StrModule string
+	DockerModules := []string{"iconv", "pdo", "sqlite", "mysqli", "gd", "exif", "intl", "xsl",
 		"json", "soap", "dom", "zip", "opcache", "xml", "mbstring",
 		"bz2", "calendar", "ctype", "bcmatch",
 	}
 
-	docker_php_ext_install := "docker-php-ext-install "
-	for _, module := range (php_modules) {
+	DockerPhpExtInstall := "docker-php-ext-install "
+	for _, module := range phpModules {
 		switcher = true
-		for _, nopecl := range (modules_nopecl) {
+		for _, nopecl := range ModulesNopecl {
 			if module == nopecl {
-				arg, str_module = Unstandart_modules_install(module)
+				arg, StrModule = UnstandartModulesInstall(module)
 				//generate script
 				switcher = false
-				modules_lines += str_module
+				ModulesLines += StrModule
 				ARG += arg + "\n"
 			}
 		}
 		if switcher {
-			for _, docker_module := range (docker_modules) {
-				if module == docker_module {
-					docker_php_ext_install += module + " "
+			for _, dockerModule := range DockerModules {
+				if module == dockerModule {
+					DockerPhpExtInstall += module + " "
 				}
 			}
 		}
@@ -215,26 +215,26 @@ func main() {
 	}
 
 	letsencrypt := "pip install -U pip && \\\npip install -U certbot && \\\nmkdir -p /etc/letsencrypt/webrootauth && \\\n"
-	docker_php_ext_install += "&& \\\ndocker-php-source delete && \\\n"
+	DockerPhpExtInstall += "&& \\\ndocker-php-source delete && \\\n"
 	ARG += "\n"
 	clean := "apk del gcc musl-dev linux-headers libffi-dev augeas-dev python-dev make autoconf \n"
 	ENV := "ENV php_conf /usr/local/etc/php-fpm.conf\n"
 	ENV += "ENV fpm_conf /usr/local/etc/php-fpm.d/www.conf\n"
 	ENV += "ENV php_vars /usr/local/etc/php/conf.d/docker-vars.ini\n"
 	ENV += "ENV LD PRELOAD /usr/lib/preloadable_libconv.so php\n"
-	HEAD := "FROM " + php_version[confYaml.From].package_name + "\n" + "LABEL maintainer = " + maintainer + "\n"
+	HEAD := "FROM " + PhpVersion[confYaml.From].packageName + "\n" + "LABEL maintainer = " + maintainer + "\n"
 
 	Dockerfile := HEAD
 	Dockerfile += ENV
 	Dockerfile += ARG
-	if php_version[confYaml.From].distrib == "alpine" {
-		Dockerfile += Soft_install_apk()
+	if PhpVersion[confYaml.From].distrib == "alpine" {
+		Dockerfile += SoftInstallApk()
 	}
-	Dockerfile += docker_php_ext_install
+	Dockerfile += DockerPhpExtInstall
 	if confYaml.Composer == "YES" {
-		Dockerfile += Php_composer_setup()
+		Dockerfile += PhpComposerSetup()
 	}
-	Dockerfile += modules_lines
+	Dockerfile += ModulesLines
 	Dockerfile += letsencrypt
 	Dockerfile += clean
 	fmt.Println(Dockerfile)
