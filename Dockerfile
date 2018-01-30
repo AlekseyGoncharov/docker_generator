@@ -14,7 +14,7 @@ RUN apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/test
 echo @testing http://nl.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories && \
 echo @main http://mirror.yandex.ru/mirrors/alpine/edge/main >>  /etc/apk/repositories && \
 echo @community http://mirror.yandex.ru/mirrors/alpine/edge/community >>  /etc/apk/repositories && \
-echo /etc/apk/respositories && \
+echo /etc/apk/repositories && \
 apk update && \
 apk add --no-cache bash \
 wget \
@@ -44,7 +44,7 @@ freetype-dev \
 sqlite-dev \
 bzip2-dev \
 libmemcached-dev \
-libjpeg-tubo-dev \
+libjpeg-turbo-dev \
 && \
 docker-php-ext-configure gd \
 --with-gd \

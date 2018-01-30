@@ -26,7 +26,7 @@ func SoftInstallApk() string {
 	software += "echo @testing http://nl.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories && \\\n"
 	software += "echo @main http://mirror.yandex.ru/mirrors/alpine/edge/main >>  /etc/apk/repositories && \\\n"
 	software += "echo @community http://mirror.yandex.ru/mirrors/alpine/edge/community >>  /etc/apk/repositories && \\\n"
-	software += "echo /etc/apk/respositories && \\\n"
+	software += "echo /etc/apk/repositories && \\\n"
 	software += "apk update && \\\n"
 	software += "apk add --no-cache bash \\\n"
 	software += "wget \\\n"
