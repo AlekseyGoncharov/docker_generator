@@ -5,13 +5,12 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
-	"strings"
 )
 
 type ParsingYaml struct {
-	From     string `yaml:"FROM"`
-	Composer string `yaml:"composer,omitempty"`
-	PhpExt   string `yaml:"php_modules"`
+	From     string      `yaml:"FROM"`
+	Composer string      `yaml:"composer,omitempty"`
+	PhpExt   interface{} `yaml:"php_modules"`
 }
 
 type Version struct {
@@ -180,16 +179,14 @@ func main() {
 	}
 
 	maintainer := "\"DockerFile generator by fp <alexwolk01@gmail.com>\" \n"
-	//composer := true
-	var phpModules []string
-	phpModules = strings.Split(confYaml.PhpExt, " ")
+	phpModules, _ := confYaml.PhpExt.([]interface{})
 	ModulesNopecl := []string{"memcached", "imagick", "msgpack"}
 
 	var switcher bool
 	ARG := "\n"
 	ModulesLines := ""
 	var arg, StrModule string
-	DockerModules := []string{"iconv", "pdo", "sqlite", "mysqli", "gd", "exif", "intl", "xsl",
+	DockerModules := []string{"iconv", "pdo_mysql", "pdo_sqlite", "mysqli", "gd", "exif", "intl", "xsl",
 		"json", "soap", "dom", "zip", "opcache", "xml", "mbstring",
 		"bz2", "calendar", "ctype", "bcmatch",
 	}
@@ -197,10 +194,11 @@ func main() {
 	DockerPhpExtInstall := "docker-php-ext-install "
 	GDconf := ""
 	for _, module := range phpModules {
+		strModule := module.(string)
 		switcher = true
 		for _, nopecl := range ModulesNopecl {
-			if module == nopecl {
-				arg, StrModule = UnstandartModulesInstall(module)
+			if strModule == nopecl {
+				arg, StrModule = UnstandartModulesInstall(strModule)
 				//generate script
 				switcher = false
 				ModulesLines += StrModule
@@ -209,9 +207,9 @@ func main() {
 		}
 		if switcher {
 			for _, dockerModule := range DockerModules {
-				if module == dockerModule {
-					DockerPhpExtInstall += module + " "
-					if module == "gd" {
+				if strModule == dockerModule {
+					DockerPhpExtInstall += strModule + " "
+					if strModule == "gd" {
 						GDconf += "docker-php-ext-configure gd \\\n"
 						GDconf += "--with-gd \\\n"
 						GDconf += "--with-freetype-dir=/usr/include/ \\\n"
