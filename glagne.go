@@ -2,7 +2,6 @@
 package main
 
 import (
-	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
@@ -61,6 +60,7 @@ func SoftInstallApk() string {
 	software += "&& \\\n"
 	return software
 }
+
 // php composer installation
 func PhpComposerSetup() string {
 	compose := "EXPECTED_COMPOSER_SIGNATURE=$(wget -q -O - https://composer.github.io/installer.sig) && \\\n"
@@ -72,6 +72,7 @@ func PhpComposerSetup() string {
 	compose += "php -r \"unlink('composer-setup.php');\" && \\\n"
 	return compose
 }
+
 //install memcached
 func StdConfAndMake() string {
 	MakeAndConf := "phpize &&\\\n"
@@ -125,6 +126,7 @@ func InstallImagick() string {
 	imagick += "apk del .imagick-build-dependencies && \\\n"
 	return imagick
 }
+
 // Setup modules from code(GIT)
 func UnstandartModulesInstall(module string) (string, string) {
 	if module == "memcached" {
@@ -237,5 +239,5 @@ func main() {
 	Dockerfile += ModulesLines
 	Dockerfile += letsencrypt
 	Dockerfile += clean
-	fmt.Println(Dockerfile)
+	ioutil.WriteFile("Dockerfile", []byte(Dockerfile), 0644)
 }
