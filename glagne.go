@@ -56,7 +56,7 @@ func SoftInstallApk() string {
 	software += "sqlite-dev \\\n"
 	software += "bzip2-dev \\\n"
 	software += "libmemcached-dev \\\n"
-	software += "libjpeg-tubo-dev \\\n"
+	software += "libjpeg-turbo-dev \\\n"
 	software += "&& \\\n"
 	return software
 }
@@ -195,6 +195,7 @@ func main() {
 	}
 
 	DockerPhpExtInstall := "docker-php-ext-install "
+	GDconf := ""
 	for _, module := range phpModules {
 		switcher = true
 		for _, nopecl := range ModulesNopecl {
@@ -210,7 +211,16 @@ func main() {
 			for _, dockerModule := range DockerModules {
 				if module == dockerModule {
 					DockerPhpExtInstall += module + " "
+					if module == "gd" {
+						GDconf += "docker-php-ext-configure gd \\\n"
+						GDconf += "--with-gd \\\n"
+						GDconf += "--with-freetype-dir=/usr/include/ \\\n"
+						GDconf += "--with-png-dir=/usr/include/ \\\n"
+						GDconf += "--with-jpeg-dir=/usr/include/ && \\\n"
+					}
 				}
+
+
 			}
 		}
 
@@ -232,6 +242,7 @@ func main() {
 	if PhpVersion[confYaml.From].distrib == "alpine" {
 		Dockerfile += SoftInstallApk()
 	}
+	Dockerfile += GDconf
 	Dockerfile += DockerPhpExtInstall
 	if confYaml.Composer == "YES" {
 		Dockerfile += PhpComposerSetup()

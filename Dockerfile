@@ -46,6 +46,11 @@ bzip2-dev \
 libmemcached-dev \
 libjpeg-tubo-dev \
 && \
+docker-php-ext-configure gd \
+--with-gd \
+--with-freetype-dir=/usr/include/ \
+--with-png-dir=/usr/include/ \
+--with-jpeg-dir=/usr/include/ && \
 docker-php-ext-install iconv mysqli gd exif intl xsl json soap dom zip opcache xml mbstring bz2 calendar ctype && \
 docker-php-source delete && \
 EXPECTED_COMPOSER_SIGNATURE=$(wget -q -O - https://composer.github.io/installer.sig) && \
