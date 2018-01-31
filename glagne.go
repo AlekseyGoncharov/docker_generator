@@ -149,8 +149,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
+	//парсим YAML
 	confYaml := ParsingYaml{}
-
 	err = yaml.Unmarshal([]byte(conf), &confYaml)
 	if err != nil {
 		log.Fatalf("error: %v", err)
