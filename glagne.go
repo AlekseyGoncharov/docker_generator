@@ -143,6 +143,75 @@ func UnstandartModulesInstall(module string) (string, string) {
 	}
 	return "", ""
 }
+func Alpine(phpModules []interface{},
+	ModulesNopecl []string,
+	DockerModules []string,
+	PhpVersion map[string]Version,
+	maintainer string,
+	confYaml ParsingYaml,
+) string {
+	var switcher bool
+	ARG := "\n"
+	ModulesLines := ""
+	DockerPhpExtInstall := "docker-php-ext-install "
+	GDconf := ""
+	var arg, StrModule string
+	for _, module := range phpModules {
+		strModule := module.(string)
+		switcher = true
+		for _, nopecl := range ModulesNopecl {
+			if strModule == nopecl {
+				arg, StrModule = UnstandartModulesInstall(strModule)
+				//generate script
+				switcher = false
+				ModulesLines += StrModule
+				ARG += arg + "\n"
+			}
+		}
+		if switcher {
+			for _, dockerModule := range DockerModules {
+				if strModule == dockerModule {
+					DockerPhpExtInstall += strModule + " "
+					if strModule == "gd" {
+						GDconf += "docker-php-ext-configure gd \\\n"
+						GDconf += "--with-gd \\\n"
+						GDconf += "--with-freetype-dir=/usr/include/ \\\n"
+						GDconf += "--with-png-dir=/usr/include/ \\\n"
+						GDconf += "--with-jpeg-dir=/usr/include/ && \\\n"
+					}
+				}
+
+			}
+		}
+
+	}
+
+	letsencrypt := "pip install -U pip && \\\npip install -U certbot && \\\nmkdir -p /etc/letsencrypt/webrootauth && \\\n"
+	DockerPhpExtInstall += "&& \\\ndocker-php-source delete && \\\n"
+	ARG += "\n"
+	clean := "apk del gcc musl-dev linux-headers libffi-dev augeas-dev python-dev make autoconf \n"
+	ENV := "ENV php_conf /usr/local/etc/php-fpm.conf\n"
+	ENV += "ENV fpm_conf /usr/local/etc/php-fpm.d/www.conf\n"
+	ENV += "ENV php_vars /usr/local/etc/php/conf.d/docker-vars.ini\n"
+	ENV += "ENV LD PRELOAD /usr/lib/preloadable_libconv.so php\n"
+	HEAD := "FROM " + PhpVersion[confYaml.From].packageName + "\n" + "LABEL maintainer = " + maintainer + "\n"
+
+	Dockerfile := HEAD
+	Dockerfile += ENV
+	Dockerfile += ARG
+	if PhpVersion[confYaml.From].distrib == "alpine" {
+		Dockerfile += SoftInstallApk()
+	}
+	Dockerfile += GDconf
+	Dockerfile += DockerPhpExtInstall
+	if confYaml.Composer == "YES" {
+		Dockerfile += PhpComposerSetup()
+	}
+	Dockerfile += ModulesLines
+	Dockerfile += letsencrypt
+	Dockerfile += clean
+	return Dockerfile
+}
 
 func main() {
 	conf, err := ioutil.ReadFile("config.yml")
@@ -182,71 +251,11 @@ func main() {
 	phpModules, _ := confYaml.PhpExt.([]interface{})
 	ModulesNopecl := []string{"memcached", "imagick", "msgpack"}
 
-	var switcher bool
-	ARG := "\n"
-	ModulesLines := ""
-	var arg, StrModule string
 	DockerModules := []string{"iconv", "pdo_mysql", "pdo_sqlite", "mysqli", "gd", "exif", "intl", "xsl",
 		"json", "soap", "dom", "zip", "opcache", "xml", "mbstring",
 		"bz2", "calendar", "ctype", "bcmatch",
 	}
 
-	DockerPhpExtInstall := "docker-php-ext-install "
-	GDconf := ""
-	for _, module := range phpModules {
-		strModule := module.(string)
-		switcher = true
-		for _, nopecl := range ModulesNopecl {
-			if strModule == nopecl {
-				arg, StrModule = UnstandartModulesInstall(strModule)
-				//generate script
-				switcher = false
-				ModulesLines += StrModule
-				ARG += arg + "\n"
-			}
-		}
-		if switcher {
-			for _, dockerModule := range DockerModules {
-				if strModule == dockerModule {
-					DockerPhpExtInstall += strModule + " "
-					if strModule == "gd" {
-						GDconf += "docker-php-ext-configure gd \\\n"
-						GDconf += "--with-gd \\\n"
-						GDconf += "--with-freetype-dir=/usr/include/ \\\n"
-						GDconf += "--with-png-dir=/usr/include/ \\\n"
-						GDconf += "--with-jpeg-dir=/usr/include/ && \\\n"
-					}
-				}
-
-
-			}
-		}
-
-	}
-
-	letsencrypt := "pip install -U pip && \\\npip install -U certbot && \\\nmkdir -p /etc/letsencrypt/webrootauth && \\\n"
-	DockerPhpExtInstall += "&& \\\ndocker-php-source delete && \\\n"
-	ARG += "\n"
-	clean := "apk del gcc musl-dev linux-headers libffi-dev augeas-dev python-dev make autoconf \n"
-	ENV := "ENV php_conf /usr/local/etc/php-fpm.conf\n"
-	ENV += "ENV fpm_conf /usr/local/etc/php-fpm.d/www.conf\n"
-	ENV += "ENV php_vars /usr/local/etc/php/conf.d/docker-vars.ini\n"
-	ENV += "ENV LD PRELOAD /usr/lib/preloadable_libconv.so php\n"
-	HEAD := "FROM " + PhpVersion[confYaml.From].packageName + "\n" + "LABEL maintainer = " + maintainer + "\n"
-
-	Dockerfile := HEAD
-	Dockerfile += ENV
-	Dockerfile += ARG
-	if PhpVersion[confYaml.From].distrib == "alpine" {
-		Dockerfile += SoftInstallApk()
-	}
-	Dockerfile += GDconf
-	Dockerfile += DockerPhpExtInstall
-	if confYaml.Composer == "YES" {
-		Dockerfile += PhpComposerSetup()
-	}
-	Dockerfile += ModulesLines
-	Dockerfile += letsencrypt
-	Dockerfile += clean
+	Dockerfile := Alpine(phpModules, ModulesNopecl, DockerModules, PhpVersion, maintainer, confYaml)
 	ioutil.WriteFile("Dockerfile", []byte(Dockerfile), 0644)
 }
