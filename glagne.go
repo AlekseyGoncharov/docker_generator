@@ -10,6 +10,7 @@ import (
 type ParsingYaml struct {
 	From     string      `yaml:"FROM"`
 	Composer string      `yaml:"composer,omitempty"`
+	Nginx    string      `yaml:"nginx,omitempty"`
 	PhpExt   interface{} `yaml:"php_modules"`
 }
 
@@ -20,7 +21,7 @@ type Version struct {
 }
 
 //install all-software
-func SoftInstallApk() string {
+func SoftInstallApk(nginxSw bool) string {
 	software := "RUN apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing gnu-libiconv && \\\n"
 	software += "echo @testing http://nl.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories && \\\n"
 	software += "echo @main http://mirror.yandex.ru/mirrors/alpine/edge/main >>  /etc/apk/repositories && \\\n"
@@ -28,6 +29,9 @@ func SoftInstallApk() string {
 	software += "echo /etc/apk/repositories && \\\n"
 	software += "apk update && \\\n"
 	software += "apk add --no-cache bash \\\n"
+	if nginxSw {
+		software += "nginx \\\n"
+	}
 	software += "wget \\\n"
 	software += "supervisor \\\n"
 	software += "curl \\\n"
@@ -185,7 +189,10 @@ func Alpine(phpModules []interface{},
 		}
 
 	}
-
+	nginxSW := false
+	if confYaml.Nginx == "YES" {
+		nginxSW = true
+	}
 	letsencrypt := "pip install -U pip && \\\npip install -U certbot && \\\nmkdir -p /etc/letsencrypt/webrootauth && \\\n"
 	DockerPhpExtInstall += "&& \\\ndocker-php-source delete && \\\n"
 	ARG += "\n"
@@ -200,7 +207,7 @@ func Alpine(phpModules []interface{},
 	Dockerfile += ENV
 	Dockerfile += ARG
 	if PhpVersion[confYaml.From].distrib == "alpine" {
-		Dockerfile += SoftInstallApk()
+		Dockerfile += SoftInstallApk(nginxSW)
 	}
 	Dockerfile += GDconf
 	Dockerfile += DockerPhpExtInstall
@@ -213,6 +220,31 @@ func Alpine(phpModules []interface{},
 	return Dockerfile
 }
 
+func Debian(phpModules []interface{},
+	ModulesNopecl []string,
+	DockerModules []string,
+	PhpVersion map[string]Version,
+	maintainer string,
+	confYaml ParsingYaml,
+) string {
+	for _, module := range phpModules {
+		strModule := module.(string)
+		for _, moduleStd := range DockerModules {
+			if strModule == moduleStd {
+				// docker install
+				continue
+			}
+			for _, aptmodule := range ModulesNopecl {
+				if strModule == aptmodule {
+					//apt-install
+				}
+			}
+		}
+	}
+	HEAD := "FROM " + PhpVersion[confYaml.From].packageName + "\n" + "LABEL maintainer = " + maintainer + "\n"
+	Dockerfile := HEAD
+	return Dockerfile
+}
 func main() {
 	conf, err := ioutil.ReadFile("config.yml")
 	if err != nil {
@@ -255,7 +287,12 @@ func main() {
 		"json", "soap", "dom", "zip", "opcache", "xml", "mbstring",
 		"bz2", "calendar", "ctype", "bcmatch",
 	}
+	var Dockerfile string
+	if PhpVersion[confYaml.From].distrib == "alpine" {
+		Dockerfile = Alpine(phpModules, ModulesNopecl, DockerModules, PhpVersion, maintainer, confYaml)
+	} else if PhpVersion[confYaml.From].distrib == "debian" {
+		Dockerfile = Debian(phpModules, ModulesNopecl, DockerModules, PhpVersion, maintainer, confYaml)
+	}
 
-	Dockerfile := Alpine(phpModules, ModulesNopecl, DockerModules, PhpVersion, maintainer, confYaml)
 	ioutil.WriteFile("Dockerfile", []byte(Dockerfile), 0644)
 }

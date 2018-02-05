@@ -1,5 +1,6 @@
 FROM: 7.1-alpine
 composer: YES
+nginx: YES
 php_modules:
   - iconv
   - pdo_mysql
