@@ -110,6 +110,7 @@ func InstallMsgpack() string {
 	return msgpack
 }
 
+//Install Imagick
 func InstallImagick() string {
 	imagick := "apk add --no-cache --virtual .imagick-build-dependencies \\\n"
 	imagick += "  autoconf \\\n"
