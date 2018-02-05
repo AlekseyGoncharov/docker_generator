@@ -142,7 +142,7 @@ func UnstandartModulesInstall(module string) (string, string) {
 		return arg, InstallMsgpack()
 	}
 	if module == "imagick" {
-		arg := "ARG IMAGICK_TAG = \"3.4.2\""
+		arg := "ARG IMAGICK_TAG=\"3.4.2\""
 		return arg, InstallImagick()
 	}
 	return "", ""
