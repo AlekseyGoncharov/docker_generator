@@ -8,10 +8,10 @@ import (
 )
 
 type ParsingYaml struct {
-	From     string      `yaml:"FROM"`
-	Composer string      `yaml:"composer,omitempty"`
-	Nginx    string      `yaml:"nginx,omitempty"`
-	PhpExt   interface{} `yaml:"php_modules"`
+	From     string      `yaml:"FROM"`               //distrib
+	Composer string      `yaml:"composer,omitempty"` //install compose YES or NO
+	Nginx    string      `yaml:"nginx,omitempty"`    //install nginx YES or NO
+	PhpExt   interface{} `yaml:"php_modules"`        // list php-modules
 }
 
 type Version struct {
