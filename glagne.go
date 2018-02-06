@@ -228,11 +228,12 @@ func Debian(phpModules []interface{},
 	maintainer string,
 	confYaml ParsingYaml,
 ) string {
+	DockerPhpExtInstall := "docker-php-ext-install "
 	for _, module := range phpModules {
 		strModule := module.(string)
 		for _, moduleStd := range DockerModules {
 			if strModule == moduleStd {
-				// docker install
+				DockerPhpExtInstall += strModule
 				continue
 			}
 			for _, aptmodule := range ModulesNopecl {
