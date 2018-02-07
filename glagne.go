@@ -221,6 +221,18 @@ func Alpine(phpModules []interface{},
 	return Dockerfile
 }
 
+func GenerateRunScript() error {
+	//This function generate script.sh
+	script := "adyn"
+	script += GenerateCustomConfigurationPhp()
+	return nil
+}
+
+func GenerateCustomConfigurationPhp() string {
+	//This function generate custom config php.ini
+
+	return ""
+}
 func Debian(phpModules []interface{},
 	ModulesNopecl []string,
 	DockerModules []string,
@@ -294,6 +306,11 @@ func main() {
 		Dockerfile = Alpine(phpModules, ModulesNopecl, DockerModules, PhpVersion, maintainer, confYaml)
 	} else if PhpVersion[confYaml.From].distrib == "debian" {
 		Dockerfile = Debian(phpModules, ModulesNopecl, DockerModules, PhpVersion, maintainer, confYaml)
+	}
+
+	err = GenerateRunScript()
+	if err != nil {
+		return
 	}
 
 	ioutil.WriteFile("Dockerfile", []byte(Dockerfile), 0644)
