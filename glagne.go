@@ -76,7 +76,7 @@ func PhpComposerSetup() string {
 	return compose
 }
 
-//install memcached
+
 func StdConfAndMake() string {
 	MakeAndConf := "phpize &&\\\n"
 	MakeAndConf += "./configure && \\\n"
@@ -84,6 +84,8 @@ func StdConfAndMake() string {
 	MakeAndConf += "make install &&\\\n"
 	return MakeAndConf
 }
+
+//install memcached
 func InstallMemcached() string {
 	memcach := "apk add --virtual .memcached-build-dependencies \\\n"
 	memcach += "	libmemcached-dev \\\n"
@@ -103,6 +105,7 @@ func InstallMemcached() string {
 	return memcach
 }
 
+//install msgpack
 func InstallMsgpack() string {
 	msgpack := "git clone -o ${MSGPACK_TAG} --depth 1 https://github.com/msgpack/msgpack-php.git /tmp/msgpack-php && \\\n"
 	msgpack += "cd /tmp/msgpack-php && \\\n"
@@ -148,6 +151,8 @@ func UnstandartModulesInstall(module string) (string, string) {
 	}
 	return "", ""
 }
+
+//Create Dockerfile from alpine-based php-fpm
 func Alpine(phpModules []interface{},
 	ModulesNopecl []string,
 	DockerModules []string,
@@ -221,6 +226,7 @@ func Alpine(phpModules []interface{},
 	return Dockerfile
 }
 
+//Create run script
 func GenerateRunScript() error {
 	//This function generate script.sh
 	script := "adyn"
@@ -228,6 +234,7 @@ func GenerateRunScript() error {
 	return nil
 }
 
+//Configure custom configuration to php
 func GenerateCustomConfigurationPhp() string {
 	//This function generate custom config php.ini
 	parameters := make(map[string]string)
@@ -239,6 +246,8 @@ func GenerateCustomConfigurationPhp() string {
 	phpConfigure += "echo \"memory_limit =  " + parameters["MemoryLimit"] + "\" >> ${php_vars} &&\\\n"
 	return phpConfigure
 }
+
+//Create Dockerfile from debian-based php-fpm
 func Debian(phpModules []interface{},
 	ModulesNopecl []string,
 	DockerModules []string,
