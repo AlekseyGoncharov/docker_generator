@@ -5,6 +5,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
+
 )
 
 type ParsingYaml struct {
@@ -321,6 +322,12 @@ func main() {
 		Dockerfile = Alpine(phpModules, ModulesNopecl, DockerModules, PhpVersion, maintainer, confYaml)
 	} else if PhpVersion[confYaml.From].distrib == "debian" {
 		Dockerfile = Debian(phpModules, ModulesNopecl, DockerModules, PhpVersion, maintainer, confYaml)
+	}
+
+	var myphp bool
+	myphp = true
+	if myphp {
+		// use users php file
 	}
 
 	err = GenerateRunScript()
