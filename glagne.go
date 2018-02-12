@@ -156,7 +156,7 @@ func UnstandartModulesInstall(module string) (string, string) {
 		arg := "ARG IMAGICK_TAG=\"3.4.2\""
 		return arg, InstallImagick()
 	}
-	if module == "xDebug" {
+	if module == "xdebug" {
 		arg := "ARG XDEBUG_TAG=2.6.0"
 		return arg, InstallXdebug()
 	}
@@ -321,7 +321,7 @@ func main() {
 
 	maintainer := "\"DockerFile generator by fp <alexwolk01@gmail.com>\" \n"
 	phpModules, _ := confYaml.PhpExt.([]interface{})
-	ModulesNopecl := []string{"memcached", "imagick", "msgpack"}
+	ModulesNopecl := []string{"memcached", "imagick", "msgpack", "xdebug"}
 
 	DockerModules := []string{"iconv", "pdo_mysql", "pdo_sqlite", "mysqli", "gd", "exif", "intl", "xsl",
 		"json", "soap", "dom", "zip", "opcache", "xml", "mbstring",
