@@ -135,6 +135,12 @@ func InstallImagick() string {
 	return imagick
 }
 
+func InstallXdebug() string {
+	xdebug := "git clone -o ${XDEBUG_TAG} --depth 1 https://github.com/xdebug/xdebug.git /tmp/xdebug &&\\\n"
+	xdebug += "cd /tmp/xdebug && \\\n"
+	xdebug += StdConfAndMake()
+	return xdebug
+}
 // Setup modules from code(GIT)
 func UnstandartModulesInstall(module string) (string, string) {
 	if module == "memcached" {
@@ -149,6 +155,10 @@ func UnstandartModulesInstall(module string) (string, string) {
 	if module == "imagick" {
 		arg := "ARG IMAGICK_TAG=\"3.4.2\""
 		return arg, InstallImagick()
+	}
+	if module == "xDebug" {
+		arg := "ARG XDEBUG_TAG=2.6.0"
+		return arg, InstallXdebug()
 	}
 	return "", ""
 }
