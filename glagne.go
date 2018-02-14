@@ -77,7 +77,7 @@ func PhpComposerSetup() string {
 	return compose
 }
 
-
+// make - make install for php_modules
 func StdConfAndMake() string {
 	MakeAndConf := "phpize &&\\\n"
 	MakeAndConf += "./configure && \\\n"
@@ -135,6 +135,7 @@ func InstallImagick() string {
 	return imagick
 }
 
+//Install Xdebug
 func InstallXdebug() string {
 	xdebug := "git clone -o ${XDEBUG_TAG} --depth 1 https://github.com/xdebug/xdebug.git /tmp/xdebug &&\\\n"
 	xdebug += "cd /tmp/xdebug && \\\n"
