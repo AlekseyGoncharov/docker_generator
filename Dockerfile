@@ -7,8 +7,9 @@ ENV php_vars /usr/local/etc/php/conf.d/docker-vars.ini
 ENV LD PRELOAD /usr/lib/preloadable_libconv.so php
 
 ARG MSGPACK_TAG=msgpack-2.0.2
-ARG IMAGICK_TAG = "3.4.2"
+ARG IMAGICK_TAG="3.4.2"
 ARG MEMCACHED_TAG=v3.0.4
+ARG REDIS_TAG=3.1.6
 
 RUN apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing gnu-libiconv && \
 echo @testing http://nl.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories && \
@@ -99,6 +100,12 @@ phpize &&\
 make && \
 make install && \
 apk del .memcached-build-dependencies && \
+git clone -o ${REDIS_TAG} --depth 1 https://github.com/phpredis/phpredis.git /tmp/redis &&\
+cd /tmp/redis \
+phpize &&\
+./configure && \
+make && \
+make install &&\
 pip install -U pip && \
 pip install -U certbot && \
 mkdir -p /etc/letsencrypt/webrootauth && \
