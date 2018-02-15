@@ -142,6 +142,15 @@ func InstallXdebug() string {
 	xdebug += StdConfAndMake()
 	return xdebug
 }
+
+//Install Redis
+func InstallRedis() string {
+	redis := "git clone -o ${REDIS_TAG} --depth 1 https://github.com/phpredis/phpredis.git /tmp/redis &&\\\n"
+	redis += "cd /tmp/redis \\\n"
+	redis += StdConfAndMake()
+	return redis
+}
+
 // Setup modules from code(GIT)
 func UnstandartModulesInstall(module string) (string, string) {
 	if module == "memcached" {
@@ -160,6 +169,10 @@ func UnstandartModulesInstall(module string) (string, string) {
 	if module == "xdebug" {
 		arg := "ARG XDEBUG_TAG=2.6.0"
 		return arg, InstallXdebug()
+	}
+	if module == "redis" {
+		arg := "ARG REDIS_TAG=3.1.6"
+		return arg, InstallRedis()
 	}
 	return "", ""
 }
@@ -322,7 +335,7 @@ func main() {
 
 	maintainer := "\"DockerFile generator by fp <alexwolk01@gmail.com>\" \n"
 	phpModules, _ := confYaml.PhpExt.([]interface{})
-	ModulesNopecl := []string{"memcached", "imagick", "msgpack", "xdebug"}
+	ModulesNopecl := []string{"memcached", "imagick", "msgpack", "xdebug", "redis"}
 
 	DockerModules := []string{"iconv", "pdo_mysql", "pdo_sqlite", "mysqli", "gd", "exif", "intl", "xsl",
 		"json", "soap", "dom", "zip", "opcache", "xml", "mbstring",
