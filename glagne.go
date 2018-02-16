@@ -349,9 +349,9 @@ func main() {
 	}
 
 	var myphp bool
-	myphp = true
+	myphp = false
 	if myphp {
-		// use users php file
+		Dockerfile += "ADD php.ini /etc/php.ini" // use users php file
 	}
 
 	err = GenerateRunScript()
