@@ -248,9 +248,59 @@ func Alpine(phpModules []interface{},
 	Dockerfile += ModulesLines
 	Dockerfile += letsencrypt
 	Dockerfile += clean
+	CreateSupervisord(nginxSW)
 	return Dockerfile
 }
 
+func CreateSupervisord(nginxsw bool) error {
+	supervisor := "[unix_http_server]\n"
+	supervisor += "file=/dev/shm/supervisor.sock ; (the path to the socket file)\n"
+	supervisor += "\n"
+	supervisor += "[supervisord]\n"
+	supervisor += "logfile=/tmp/supervisord.log ; (main log file;default $CWD/supervisord.log)\n"
+	supervisor += "logfile_maxbytes=50MB ; (max main logfile bytes b4 rotation;default 50MB)\n"
+	supervisor += "logfile_backups=10 ; (num of main logfile rotation backups;default 10)\n"
+	supervisor += "loglevel=info ; (log level;default info; others: debug,warn,trace)\n"
+	supervisor += "pidfile=/tmp/supervisord.pid ; (supervisord pidfile;default supervisord.pid)\n"
+	supervisor += "nodaemon=false ; (start in foreground if true;default false)\n"
+	supervisor += "minfds=1024 ; (min. avail startup file descriptors;default 1024)\n"
+	supervisor += "minprocs=200 ; (min. avail process descriptors;default 200)\n"
+	supervisor += "user=root ;\n"
+	supervisor += "\n"
+	supervisor += "; the below section must remain in the config file for RPC\n" +
+		"; (supervisorctl/web interface) to work, additional interfaces may be\n" +
+		"; added by defining them in separate rpcinterface: sections"
+	supervisor += "[rpcinterface:supervisor]\n"
+	supervisor += "supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface\n"
+	supervisor += "\n[supervisorctl]\n"
+	supervisor += "serverurl=unix:///dev/shm/supervisor.sock ; use a unix:// URL for a unix socket\n"
+	supervisor += "\n[program:php-fpm]\n"
+	supervisor += "command = /usr/local/sbin/php-fpm --nodaemonize --fpm-config /usr/local/etc/php-fpm.d/www.conf\n"
+	supervisor += "autostart=true\n"
+	supervisor += "autorestart=true\n"
+	supervisor += "priority=5\n"
+	supervisor += "stdout_logfile=/dev/stdout\n"
+	supervisor += "stdout_logfile_maxbytes=0\n"
+	supervisor += "stderr_logfile=/dev/stderr\n"
+	supervisor += "stderr_logfile_maxbytes=0\n"
+	if nginxsw {
+		supervisor += "\n[program:nginx]\n"
+		supervisor += "command=/usr/sbin/nginx -g \"daemon off; error_log /dev/stderr info;\"\n"
+		supervisor += "autostart=true\n"
+		supervisor += "autorestart=true\n"
+		supervisor += "priority=10\n"
+		supervisor += "stdout_events_enabled=true\n"
+		supervisor += "stderr_events_enabled=true\n"
+		supervisor += "stdout_logfile=/dev/stdout\n"
+		supervisor += "stdout_logfile_maxbytes=0\n"
+		supervisor += "stderr_logfile=/dev/stderr\n"
+		supervisor += "stderr_logfile_maxbytes=0\n"
+	}
+	supervisor += "\n[include]\n"
+	supervisor += "files = /etc/supervisor/conf.d/*.conf\n"
+	ioutil.WriteFile("supervisord.conf", []byte(supervisor), 0755)
+	return nil
+}
 //Create run script
 func GenerateRunScript() error {
 	//This function generate script.sh
