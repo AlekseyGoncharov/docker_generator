@@ -248,10 +248,13 @@ func Alpine(phpModules []interface{},
 	Dockerfile += ModulesLines
 	Dockerfile += letsencrypt
 	Dockerfile += clean
+	ConfigList := "ADD supervisord.conf /etc/supervisor.conf"
+	Dockerfile += ConfigList
 	CreateSupervisord(nginxSW)
 	return Dockerfile
 }
 
+//generate supervisor config
 func CreateSupervisord(nginxsw bool) error {
 	supervisor := "[unix_http_server]\n"
 	supervisor += "file=/dev/shm/supervisor.sock ; (the path to the socket file)\n"
