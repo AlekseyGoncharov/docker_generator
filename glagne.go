@@ -277,6 +277,7 @@ func CreateSupervisord(nginxsw bool) error {
 	supervisor += "supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface\n"
 	supervisor += "\n[supervisorctl]\n"
 	supervisor += "serverurl=unix:///dev/shm/supervisor.sock ; use a unix:// URL for a unix socket\n"
+	//start php-fpm
 	supervisor += "\n[program:php-fpm]\n"
 	supervisor += "command = /usr/local/sbin/php-fpm --nodaemonize --fpm-config /usr/local/etc/php-fpm.d/www.conf\n"
 	supervisor += "autostart=true\n"
@@ -286,6 +287,7 @@ func CreateSupervisord(nginxsw bool) error {
 	supervisor += "stdout_logfile_maxbytes=0\n"
 	supervisor += "stderr_logfile=/dev/stderr\n"
 	supervisor += "stderr_logfile_maxbytes=0\n"
+	//start nginx
 	if nginxsw {
 		supervisor += "\n[program:nginx]\n"
 		supervisor += "command=/usr/sbin/nginx -g \"daemon off; error_log /dev/stderr info;\"\n"
