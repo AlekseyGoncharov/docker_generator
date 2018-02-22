@@ -249,6 +249,12 @@ func Alpine(phpModules []interface{},
 	Dockerfile += letsencrypt
 	Dockerfile += clean
 	ConfigList := "ADD supervisord.conf /etc/supervisor.conf"
+	ConfigList += "ADD start.sh /start.sh"
+	if nginxSW {
+		ConfigList += "EXPOSE 443 80"
+	} else {
+		ConfigList += "EXPOSE 9000"
+	}
 	Dockerfile += ConfigList
 	CreateSupervisord(nginxSW)
 	return Dockerfile
