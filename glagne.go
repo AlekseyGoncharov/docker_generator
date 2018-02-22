@@ -256,7 +256,10 @@ func Alpine(phpModules []interface{},
 		ConfigList += "EXPOSE 9000"
 	}
 	Dockerfile += ConfigList
-	CreateSupervisord(nginxSW)
+	err := CreateSupervisord(nginxSW)
+	if err != nil {
+		log.Fatalf("error supervisord.conf don't create", err)
+	}
 	return Dockerfile
 }
 
