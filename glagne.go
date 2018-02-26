@@ -327,9 +327,12 @@ func GenerateRunScript() error {
 func GenerateCustomConfigurationPhp() string {
 	//This function generate custom config php.ini
 	parameters := make(map[string]string)
-	parameters["UploadMaxFilesize"] = "100M"
-	parameters["PostMaxSize"] = "100M"
-	parameters["MemoryLimit"] = "128M"
+	uploadMaxFilesize := "100M"
+	postMaxSize := "100M"
+	MemoryLimit := "128M"
+	parameters["UploadMaxFilesize"] = uploadMaxFilesize
+	parameters["PostMaxSize"] = postMaxSize
+	parameters["MemoryLimit"] = MemoryLimit
 	phpConfigure := "RUN " + "echo \"upload_max_filesize =  " + parameters["UploadMaxFilesize"] + "\" >> ${php_vars} &&\\\n"
 	phpConfigure += "echo \"post_max_size =  " + parameters["PostMaxSize"] + "\" >> ${php_vars} &&\\\n"
 	phpConfigure += "echo \"memory_limit =  " + parameters["MemoryLimit"] + "\" >> ${php_vars} &&\\\n"
