@@ -159,18 +159,22 @@ func UnstandartModulesInstall(module string) (string, string) {
 		return arg, InstallMemcached()
 	}
 	if module == "msgpack" {
+		// version msgpack
 		arg := "ARG MSGPACK_TAG=msgpack-2.0.2"
 		return arg, InstallMsgpack()
 	}
 	if module == "imagick" {
+		// version imagick
 		arg := "ARG IMAGICK_TAG=\"3.4.2\""
 		return arg, InstallImagick()
 	}
 	if module == "xdebug" {
+		// version xdebug
 		arg := "ARG XDEBUG_TAG=2.6.0"
 		return arg, InstallXdebug()
 	}
 	if module == "redis" {
+		// version redis
 		arg := "ARG REDIS_TAG=3.1.6"
 		return arg, InstallRedis()
 	}
