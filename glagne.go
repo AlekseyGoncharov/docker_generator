@@ -351,21 +351,22 @@ func Debian(phpModules []interface{},
 	maintainer string,
 	confYaml ParsingYaml,
 ) string {
+	aptlib := make(map[string]string)
+	aptlib["xsl"] = "libxslt-dev \\\n"
+	apt := "RUN apt-get update && apt-get install -y \\\n"
 	DockerPhpExtInstall := "docker-php-ext-install "
-	for _, module := range phpModules {
-		strModule := module.(string)
-		for _, moduleStd := range DockerModules {
-			if strModule == moduleStd {
-				DockerPhpExtInstall += strModule
-				continue
-			}
-			for _, aptmodule := range ModulesNopecl {
-				if strModule == aptmodule {
-					//apt-install
-				}
+	for _, modules := range phpModules {
+		strmodule := modules.(string)
+		for _, phpmodule := range DockerModules {
+			if strmodule == phpmodule {
+				DockerPhpExtInstall += strmodule
+				apt += aptlib[strmodule]
+			} else {
+				//pecl
 			}
 		}
 	}
+
 	HEAD := "FROM " + PhpVersion[confYaml.From].packageName + "\n" + "LABEL maintainer = " + maintainer + "\n"
 	Dockerfile := HEAD
 	return Dockerfile
@@ -393,15 +394,15 @@ func main() {
 		distrib:     "alpine",
 		packageName: "php:7.2-fpm-alpine",
 	}
-	PhpVersion["7.1-jessie"] = Version{
+	PhpVersion["7.1-fpm"] = Version{
 		php:         "7.1",
 		distrib:     "debian",
-		packageName: "php:7.1-fpm-jessie",
+		packageName: "php:7.1-fpm",
 	}
-	PhpVersion["7.2-jessie"] = Version{
+	PhpVersion["7.2-fpm"] = Version{
 		php:         "7.2",
 		distrib:     "debian",
-		packageName: "php:7.2-fpm-jessie",
+		packageName: "php:7.2-fpm",
 	}
 
 	maintainer := "\"DockerFile generator by fp <alexwolk01@gmail.com>\" \n"
