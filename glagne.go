@@ -362,7 +362,13 @@ func Debian(phpModules []interface{},
 				DockerPhpExtInstall += strmodule
 				apt += aptlib[strmodule]
 			} else {
-				//pecl
+				for _, pecl := range ModulesNopecl {
+					if strmodule == pecl {
+						apt += aptlib[strmodule]
+						//pecl
+					}
+
+				}
 			}
 		}
 	}
