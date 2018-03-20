@@ -1,4 +1,4 @@
-FROM: 7.1-alpine
+FROM: 7.1-fpm
 composer: YES
 nginx: YES
 php_modules:
@@ -25,3 +25,4 @@ php_modules:
   - imagick
   - memcached
   - redis
+  - xdebug

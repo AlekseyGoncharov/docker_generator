@@ -353,28 +353,34 @@ func Debian(phpModules []interface{},
 ) string {
 	aptlib := make(map[string]string)
 	aptlib["xsl"] = "libxslt-dev \\\n"
+	aptlib["mcrypt"] = "libmcrypt \\\n"
+	aptlib["memcached"] = "libmemcached-dev \\\nzlib1g-dev \\\n"
+	aptlib["pdo_sqlite"] = "libsqlite3-dev \\\n"
+	aptlib["intl"] = "libicu-dev \\\n"
+	aptlib["bz2"] = "libbz2-dev \\\n"
 	apt := "RUN apt-get update && apt-get install -y \\\n"
-	DockerPhpExtInstall := "docker-php-ext-install "
+	DockerPhpExtInstall := "&&docker-php-ext-install "
 	for _, modules := range phpModules {
 		strmodule := modules.(string)
 		for _, phpmodule := range DockerModules {
 			if strmodule == phpmodule {
-				DockerPhpExtInstall += strmodule
+				DockerPhpExtInstall += strmodule + " "
 				apt += aptlib[strmodule]
-			} else {
-				for _, pecl := range ModulesNopecl {
-					if strmodule == pecl {
-						apt += aptlib[strmodule]
-						//pecl
-					}
-
-				}
 			}
 		}
-	}
+		for _, pecl := range ModulesNopecl {
+			if strmodule == pecl {
+				apt += aptlib[strmodule]
+				//pecl
+			}
+		}
+
+
+		}
 
 	HEAD := "FROM " + PhpVersion[confYaml.From].packageName + "\n" + "LABEL maintainer = " + maintainer + "\n"
 	Dockerfile := HEAD
+	Dockerfile += apt + DockerPhpExtInstall
 	return Dockerfile
 }
 func main() {
