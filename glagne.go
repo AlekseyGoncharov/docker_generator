@@ -423,7 +423,7 @@ func main() {
 
 	DockerModules := []string{"iconv", "pdo_mysql", "pdo_sqlite", "mysqli", "gd", "exif", "intl", "xsl",
 		"json", "soap", "dom", "zip", "opcache", "xml", "mbstring",
-		"bz2", "calendar", "ctype", "bcmatch",
+		"bz2", "calendar", "ctype", "bcmatch", "mcrypt",
 	}
 	var Dockerfile string
 	if PhpVersion[confYaml.From].distrib == "alpine" {
