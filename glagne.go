@@ -262,7 +262,7 @@ func Alpine(phpModules []interface{},
 	Dockerfile += ConfigList
 	err := CreateSupervisord(nginxSW)
 	if err != nil {
-		log.Fatalf("error supervisord.conf don't create", err)
+		log.Fatalf("error: %v", err)
 	}
 	return Dockerfile
 }
